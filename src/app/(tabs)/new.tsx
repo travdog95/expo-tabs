@@ -1,12 +1,14 @@
 import { StyleSheet, Text, View } from "react-native";
 
-export default function TabTwoScreen() {
+import React from "react";
+
+const AddPost = () => {
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Tab Two</Text>
+      <Text style={styles.title}>Add Post</Text>
     </View>
   );
-}
+};
 
 const styles = StyleSheet.create({
   container: {
@@ -19,3 +21,5 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
   },
 });
+
+export default AddPost;
