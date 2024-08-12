@@ -1,12 +1,21 @@
-import React from "react";
 import FontAwesome from "@expo/vector-icons/FontAwesome";
-import { Tabs, Redirect } from "expo-router";
+import { Tabs, Redirect, Link } from "expo-router";
+import { Pressable, useColorScheme } from "react-native";
 import { useAuth } from "@/src/providers/AuthProvider";
+import Colors from "@/src/constants/Colors";
 
 // You can explore the built-in icon families and icons on the web at https://icons.expo.fyi/
 
-export default function TabLayout() {
+const TabBarIcon = (props: {
+  name: React.ComponentProps<typeof FontAwesome>["name"];
+  color: string;
+}) => {
+  return <FontAwesome size={28} style={{ marginBottom: -3 }} />;
+};
+
+const TabLayout = () => {
   const { isAuthenticated } = useAuth();
+  const colorScheme = useColorScheme();
 
   if (!isAuthenticated) {
     return <Redirect href="/(auth)" />;
@@ -15,31 +24,47 @@ export default function TabLayout() {
   return (
     <Tabs
       screenOptions={{
-        tabBarActiveTintColor: "black",
-        tabBarShowLabel: false,
+        tabBarActiveTintColor: Colors[colorScheme ?? "light"].tint,
+        // tabBarShowLabel: false,
       }}
     >
       <Tabs.Screen
         name="index"
         options={{
-          headerTitle: "Home",
-          tabBarIcon: ({ color }) => <FontAwesome name="home" size={26} color={color} />,
+          title: "Menu",
+          tabBarIcon: ({ color }) => <TabBarIcon name="cutlery" color={color} />,
+          headerRight: () => (
+            <Link href="/modal" asChild>
+              <Pressable>
+                {({ pressed }) => (
+                  <FontAwesome
+                    name="info-circle"
+                    size={25}
+                    color={Colors[colorScheme ?? "light"].text}
+                    style={{ marginRight: 15, opacity: pressed ? 0.5 : 1 }}
+                  />
+                )}
+              </Pressable>
+            </Link>
+          ),
         }}
       />
       <Tabs.Screen
         name="new"
         options={{
-          headerTitle: "Add Post",
-          tabBarIcon: ({ color }) => <FontAwesome name="plus-square-o" size={26} color={color} />,
+          title: "Orders",
+          tabBarIcon: ({ color }) => <TabBarIcon name="list" color={color} />,
         }}
       />
       <Tabs.Screen
         name="profile"
         options={{
-          headerTitle: "Profile",
-          tabBarIcon: ({ color }) => <FontAwesome name="user" size={26} color={color} />,
+          title: "Profile",
+          tabBarIcon: ({ color }) => <TabBarIcon name="user" color={color} />,
         }}
       />
     </Tabs>
   );
-}
+};
+
+export default TabLayout;
