@@ -6,6 +6,7 @@ export default function RootLayout() {
     <AuthProvider>
       <Stack>
         <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+        <Stack.Screen name="cart" options={{ presentation: "modal" }} />
       </Stack>
     </AuthProvider>
   );
