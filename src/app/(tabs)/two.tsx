@@ -1,11 +1,9 @@
 import { StyleSheet, Text, View } from "react-native";
 
-import React from "react";
-
-const AddPost = () => {
+const OrdersScreen = () => {
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Add Post</Text>
+      <Text style={styles.title}>Tab Two</Text>
     </View>
   );
 };
@@ -22,4 +20,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default AddPost;
+export default OrdersScreen;

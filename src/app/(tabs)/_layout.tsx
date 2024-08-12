@@ -10,7 +10,7 @@ const TabBarIcon = (props: {
   name: React.ComponentProps<typeof FontAwesome>["name"];
   color: string;
 }) => {
-  return <FontAwesome size={28} style={{ marginBottom: -3 }} />;
+  return <FontAwesome size={20} style={{ marginBottom: -3 }} {...props} />;
 };
 
 const TabLayout = () => {
@@ -28,11 +28,17 @@ const TabLayout = () => {
         // tabBarShowLabel: false,
       }}
     >
+      {/* you need to have an index screen, but we're hiding it */}
+      <Tabs.Screen name="index" options={{ href: null }} />
       <Tabs.Screen
-        name="index"
+        name="menu"
         options={{
           title: "Menu",
-          tabBarIcon: ({ color }) => <TabBarIcon name="cutlery" color={color} />,
+          headerShown: false,
+
+          tabBarIcon: ({ color }) => (
+            <TabBarIcon name="cutlery" color={color} />
+          ),
           headerRight: () => (
             <Link href="/modal" asChild>
               <Pressable>
@@ -50,19 +56,19 @@ const TabLayout = () => {
         }}
       />
       <Tabs.Screen
-        name="new"
+        name="two"
         options={{
           title: "Orders",
           tabBarIcon: ({ color }) => <TabBarIcon name="list" color={color} />,
         }}
       />
-      <Tabs.Screen
+      {/* <Tabs.Screen
         name="profile"
         options={{
           title: "Profile",
           tabBarIcon: ({ color }) => <TabBarIcon name="user" color={color} />,
         }}
-      />
+      /> */}
     </Tabs>
   );
 };
