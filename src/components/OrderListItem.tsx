@@ -1,47 +1,50 @@
 import React from "react";
-import { StyleSheet, Text, Pressable } from "react-native";
+import { StyleSheet, Text, Pressable, View } from "react-native";
 import { Order } from "@/src/types";
 import { Link, useSegments } from "expo-router";
+import dayjs from "dayjs";
 
 type OrderListItemProps = {
   order: Order;
 };
 
-const ProductListItem = ({ order }: OrderListItemProps) => {
+const OrdertListItem = ({ order }: OrderListItemProps) => {
   const segments = useSegments();
+  // calculate hours since order
+  const hoursSinceOrder = dayjs().diff(dayjs(order.created_at), "hour");
 
   return (
-    <Link href={`/${segments[0]}/menu/${order.id}`} asChild>
-      {/* <Pressable style={styles.container}>
-        <Text style={styles.title}>{order.name}</Text>
-        <Text style={styles.price}>${order.price.toFixed(2)}</Text>
-      </Pressable> */}
+    <Link href={`/${segments[0]}/orders/${order.id}`} asChild>
+      <Pressable style={styles.container}>
+        <View>
+          <Text style={styles.orderNumber}>Order #{order.id}</Text>
+          <Text style={styles.age}>{hoursSinceOrder} hours ago</Text>
+        </View>
+        <Text style={styles.status}>{order.status}</Text>
+      </Pressable>
     </Link>
   );
 };
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
     backgroundColor: "white",
     padding: 10,
-    borderRadius: 20,
-    maxWidth: "50%",
+    borderRadius: 10,
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
   },
-  image: {
-    width: "100%",
-    aspectRatio: 1,
+  status: {
+    fontWeight: "600",
     alignSelf: "center",
   },
-  title: {
-    fontWeight: "600",
-    fontSize: 18,
-    marginVertical: 10,
-  },
-  price: {
+  orderNumber: {
     fontWeight: "bold",
-    marginTop: "auto",
+  },
+  age: {
+    color: "gray",
   },
 });
 
-export default ProductListItem;
+export default OrdertListItem;

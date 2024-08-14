@@ -40,12 +40,16 @@ const TabLayout = () => {
           title: "Menu",
           headerShown: false,
 
-          tabBarIcon: ({ color }) => <TabBarIcon name="cutlery" color={color} />,
+          tabBarIcon: ({ color }) => (
+            <TabBarIcon name="cutlery" color={color} />
+          ),
         }}
       />
       <Tabs.Screen
-        name="two"
+        name="orders"
         options={{
+          headerShown: false,
+
           title: "Orders",
           tabBarIcon: ({ color }) => <TabBarIcon name="list" color={color} />,
         }}

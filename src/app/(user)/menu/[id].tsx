@@ -1,5 +1,5 @@
-import { View, Text, Image, StyleSheet, Pressable } from "react-native";
 import { useState } from "react";
+import { View, Text, Image, StyleSheet, Pressable } from "react-native";
 import { Stack, useLocalSearchParams, useRouter } from "expo-router";
 import products from "@/assets/data/products";
 import Button from "@/src/components/Button";
@@ -45,7 +45,12 @@ const ProductDetailsScreen = () => {
             ]}
             onPress={() => setSelectedSize(size)}
           >
-            <Text style={[styles.sizeText, { color: selectedSize === size ? "black" : "gray" }]}>
+            <Text
+              style={[
+                styles.sizeText,
+                { color: selectedSize === size ? "black" : "gray" },
+              ]}
+            >
               {size}
             </Text>
           </Pressable>
