@@ -37,7 +37,7 @@ const ProductDetailsScreen = () => {
         options={{
           title: product.name,
           headerRight: () => (
-            <Link href="/" asChild>
+            <Link href={`/(admin)/menu/create?id=${id}`} asChild>
               <Pressable>
                 {({ pressed }) => (
                   <FontAwesome
