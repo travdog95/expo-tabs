@@ -4,39 +4,60 @@ import { ActivityIndicator } from "react-native";
 
 import { supabase } from "@/src/lib/supabase";
 
-type Auth = {
-  isAuthenticated: boolean;
+type AuthData = {
   session: Session | null;
-  user?: User;
+  profile: any;
+  loading: boolean;
+  isAdmin: boolean;
 };
 
-const AuthContext = createContext<Auth>({
-  isAuthenticated: false,
+const AuthContext = createContext<AuthData>({
   session: null,
+  profile: null,
+  loading: true,
+  isAdmin: false,
 });
 
 export default function AuthProvider({ children }: PropsWithChildren) {
   const [session, setSession] = useState<Session | null>(null);
-  const [isReady, setIsReady] = useState(false);
+  const [loading, setLoading] = useState(true);
+  const [profile, setProfile] = useState<any>(null);
 
   useEffect(() => {
-    supabase.auth.getSession().then(({ data: { session } }) => {
+    // Fetch the session data when the component mounts
+    const fetchSession = async () => {
+      const {
+        data: { session },
+      } = await supabase.auth.getSession();
       setSession(session);
-      setIsReady(true);
-    });
 
+      // Fetch the user profile if there is a session
+      if (session) {
+        const { data } = await supabase
+          .from("profiles")
+          .select("*")
+          .eq("id", session.user.id)
+          .single();
+        setProfile(data || null);
+      }
+      setLoading(false);
+    };
+
+    fetchSession();
+
+    // Listen for changes on auth state (logged in, logged out, etc.)
     supabase.auth.onAuthStateChange((_event, session) => {
       setSession(session);
     });
   }, []);
 
-  if (!isReady) {
+  if (loading) {
     return <ActivityIndicator />;
   }
 
   return (
     <AuthContext.Provider
-      value={{ session, user: session?.user, isAuthenticated: !!session?.user }}
+      value={{ session, loading, profile, isAdmin: profile?.group === "ADMIN" }}
     >
       {children}
     </AuthContext.Provider>

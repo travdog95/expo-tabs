@@ -14,11 +14,11 @@ const TabBarIcon = (props: {
 };
 
 const TabLayout = () => {
-  const { isAuthenticated } = useAuth();
+  const { isAdmin } = useAuth();
   const colorScheme = useColorScheme();
 
-  if (!isAuthenticated) {
-    return <Redirect href="/(auth)" />;
+  if (!isAdmin) {
+    return <Redirect href={"/"} />;
   }
 
   return (
@@ -40,9 +40,7 @@ const TabLayout = () => {
           title: "Menu",
           headerShown: false,
 
-          tabBarIcon: ({ color }) => (
-            <TabBarIcon name="cutlery" color={color} />
-          ),
+          tabBarIcon: ({ color }) => <TabBarIcon name="cutlery" color={color} />,
         }}
       />
       <Tabs.Screen

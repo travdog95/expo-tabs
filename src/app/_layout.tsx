@@ -8,16 +8,16 @@ export default function RootLayout() {
   const colorScheme = useColorScheme();
   return (
     <ThemeProvider value={colorScheme === "dark" ? DarkTheme : DefaultTheme}>
-      <CartProvider>
-        <AuthProvider>
+      <AuthProvider>
+        <CartProvider>
           <Stack>
             <Stack.Screen name="(admin)" options={{ headerShown: false }} />
             <Stack.Screen name="(user)" options={{ headerShown: false }} />
             <Stack.Screen name="(auth)" options={{ headerShown: false }} />
             <Stack.Screen name="cart" options={{ presentation: "modal" }} />
           </Stack>
-        </AuthProvider>
-      </CartProvider>
+        </CartProvider>
+      </AuthProvider>
     </ThemeProvider>
   );
 }
