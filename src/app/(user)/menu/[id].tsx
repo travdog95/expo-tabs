@@ -1,16 +1,19 @@
 import { useState } from "react";
-import { View, Text, Image, StyleSheet, Pressable } from "react-native";
+import { View, Text, Image, StyleSheet, Pressable, ActivityIndicator } from "react-native";
 import { Stack, useLocalSearchParams, useRouter } from "expo-router";
-import products from "@/assets/data/products";
 import Button from "@/src/components/Button";
 import { useCart } from "@/src/providers/CartProvider";
 import { PizzaSize } from "@/src/types";
+import { useProduct } from "@/src/api/products";
+import { defaultPizzaImage } from "@/src/components/CartListItem";
 
 const SIZES: PizzaSize[] = ["S", "M", "L", "XL"];
 
 const ProductDetailsScreen = () => {
-  const { id } = useLocalSearchParams();
-  const product = products.find((p) => p.id.toString() === id);
+  const { id: idString } = useLocalSearchParams();
+  const id = parseInt(typeof idString === "string" ? idString : idString[0]);
+
+  const { data: product, error, isLoading } = useProduct(id);
 
   const router = useRouter();
 
@@ -24,14 +27,18 @@ const ProductDetailsScreen = () => {
     router.push("/cart");
   };
 
-  if (!product) {
-    return <Text>Product not found</Text>;
+  if (isLoading) {
+    return <ActivityIndicator />;
+  }
+
+  if (error) {
+    return <Text>Failed to load products.</Text>;
   }
 
   return (
     <View style={styles.container}>
       <Stack.Screen options={{ title: product.name }} />
-      <Image source={{ uri: product.image }} style={styles.image} />
+      <Image source={{ uri: product.image || defaultPizzaImage }} style={styles.image} />
       <Text>Select Size</Text>
       <View style={styles.sizesContainer}>
         {SIZES.map((size) => (
@@ -45,12 +52,7 @@ const ProductDetailsScreen = () => {
             ]}
             onPress={() => setSelectedSize(size)}
           >
-            <Text
-              style={[
-                styles.sizeText,
-                { color: selectedSize === size ? "black" : "gray" },
-              ]}
-            >
+            <Text style={[styles.sizeText, { color: selectedSize === size ? "black" : "gray" }]}>
               {size}
             </Text>
           </Pressable>

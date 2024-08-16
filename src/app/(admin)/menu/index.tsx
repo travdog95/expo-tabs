@@ -1,12 +1,31 @@
-import { StyleSheet, View, FlatList, Pressable, useColorScheme } from "react-native";
-import products from "@/assets/data/products";
-import ProductListItem from "@/src/components/ProductListItem";
+import {
+  StyleSheet,
+  View,
+  FlatList,
+  Pressable,
+  useColorScheme,
+  ActivityIndicator,
+  Text,
+} from "react-native";
 import { Link, Stack } from "expo-router";
 import { FontAwesome } from "@expo/vector-icons";
+import ProductListItem from "@/src/components/ProductListItem";
 import Colors from "@/src/constants/Colors";
+import { useProductList } from "@/src/api/products";
 
 export default function MenuScreen() {
   const colorScheme = useColorScheme();
+  // Fetch the list of products from the database.
+  const { data: products, error, isLoading } = useProductList();
+
+  if (isLoading) {
+    return <ActivityIndicator />;
+  }
+
+  if (error) {
+    return <Text>Failed to load products.</Text>;
+  }
+
   return (
     <View style={styles.container}>
       <Stack.Screen
