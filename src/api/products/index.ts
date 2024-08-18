@@ -1,5 +1,6 @@
 import { supabase } from "@/src/lib/supabase";
-import { useQuery } from "@tanstack/react-query";
+import { Product } from "@/src/types";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
 // This is a custom hook that fetches a list of products from the database.
 export const useProductList = () => {
@@ -25,6 +26,78 @@ export const useProduct = (id: number) => {
         throw new Error(error.message);
       }
       return data;
+    },
+  });
+};
+
+// This is a custom hook that creates a new product in the database.
+export const useCreateProduct = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    async mutationFn(data: any) {
+      const { error, data: newProduct } = await supabase
+        .from("products")
+        .insert({
+          name: data.name,
+          price: data.price,
+          image: data.image,
+        })
+        .single();
+
+      if (error) {
+        throw new Error(error.message);
+      }
+      return newProduct;
+    },
+    async onSuccess() {
+      // Invalidate the products query to refetch the list of products
+      await queryClient.invalidateQueries(["products"]);
+    },
+  });
+};
+
+// This is a custom hook that updates an existing product in the database.
+export const useUpdateProduct = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    async mutationFn(data: any) {
+      const { error, data: updatedProduct } = await supabase
+        .from("products")
+        .update({
+          name: data.name,
+          price: data.price,
+          image: data.image,
+        })
+        .eq("id", data.id)
+        .select()
+        .single();
+
+      if (error) {
+        throw new Error(error.message);
+      }
+      return updatedProduct;
+    },
+    async onSuccess(_, { id }) {
+      // Invalidate the products query to refetch the list of products
+      await queryClient.invalidateQueries(["products"]);
+      await queryClient.invalidateQueries(["products", id]);
+    },
+  });
+};
+
+// This is a custom hook that deletes a product from the database.
+export const useDeleteProduct = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    async mutationFn(id: number) {
+      const { error } = await supabase.from("products").delete().eq("id", id);
+      if (error) {
+        throw new Error(error.message);
+      }
+    },
+    async onSuccess() {
+      // Invalidate the products query to refetch the list of products
+      await queryClient.invalidateQueries(["products"]);
     },
   });
 };

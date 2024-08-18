@@ -1,19 +1,42 @@
-import { useState } from "react";
-import { View, Text, StyleSheet, TextInput, Image, Alert } from "react-native";
-import { Stack, useLocalSearchParams } from "expo-router";
+import { useEffect, useState } from "react";
+import { View, Text, StyleSheet, TextInput, Image, Alert, ActivityIndicator } from "react-native";
+import { router, Stack, useLocalSearchParams } from "expo-router";
 import * as ImagePicker from "expo-image-picker";
 import Button from "@/src/components/Button";
 import { defaultPizzaImage } from "@/src/components/CartListItem";
 import Colors from "@/src/constants/Colors";
+import {
+  useCreateProduct,
+  useDeleteProduct,
+  useProduct,
+  useUpdateProduct,
+} from "@/src/api/products";
 
 const CreateProductScreen = () => {
   const [name, setName] = useState("");
   const [price, setPrice] = useState("");
   const [errors, setErrors] = useState("");
   const [image, setImage] = useState<string | null>(null);
+  const [isLoading, setIsLoading] = useState(false);
 
-  const { id } = useLocalSearchParams();
+  const { id: idString } = useLocalSearchParams();
+  const id = parseInt(typeof idString === "string" ? idString : idString?.[0]);
+
   const isUpdating = !!id;
+
+  const { mutate: createProduct } = useCreateProduct();
+  const { mutate: updateProduct } = useUpdateProduct();
+  const { data: fetchProduct } = useProduct(id);
+  const { mutate: deleteProduct } = useDeleteProduct();
+
+  // If we are updating a product, populate the fields with the existing product data
+  useEffect(() => {
+    if (fetchProduct) {
+      setName(fetchProduct.name);
+      setPrice(fetchProduct.price.toString());
+      setImage(fetchProduct.image);
+    }
+  }, [fetchProduct]);
 
   const onSubmit = () => {
     if (isUpdating) {
@@ -25,15 +48,35 @@ const CreateProductScreen = () => {
   const onCreate = () => {
     if (!validateInputs()) return;
 
-    console.log("Creating product...");
-    resetFields();
+    createProduct(
+      { name, price: parseFloat(price), image },
+      {
+        onSuccess: () => {
+          resetFields();
+          router.back();
+        },
+        onError: (error) => {
+          console.log("Failed to create product:", error);
+        },
+      }
+    );
   };
 
   const onUpdate = () => {
     if (!validateInputs()) return;
 
-    console.log("Updating product...");
-    resetFields();
+    updateProduct(
+      { id, name, price: parseFloat(price), image },
+      {
+        onSuccess: () => {
+          resetFields();
+          router.back();
+        },
+        onError: (error) => {
+          console.log("Failed to update product:", error);
+        },
+      }
+    );
   };
 
   const resetFields = () => {
@@ -62,7 +105,20 @@ const CreateProductScreen = () => {
   };
 
   const onDelete = () => {
-    console.log("Deleting product...");
+    setIsLoading(true);
+    deleteProduct(id, {
+      onSuccess: () => {
+        resetFields();
+        router.replace("/(admin)");
+      },
+      onError: (error) => {
+        console.log("Failed to delete product:", error);
+      },
+      onSettled: () => {
+        console.log("Delete product mutation settled");
+        setIsLoading(false);
+      },
+    });
   };
 
   const confirmDelete = () => {
@@ -89,27 +145,10 @@ const CreateProductScreen = () => {
     }
   };
 
-  const uploadImage = async () => {
-    // if (!image?.startsWith('file://')) {
-    //   return;
-    // }
-    // const base64 = await FileSystem.readAsStringAsync(image, {
-    //   encoding: 'base64',
-    // });
-    // const filePath = `${randomUUID()}.png`;
-    // const contentType = 'image/png';
-    // const { data, error } = await supabase.storage
-    //   .from('product-images')
-    //   .upload(filePath, decode(base64), { contentType });
-    // console.log(error);
-    // if (data) {
-    //   return data.path;
-    // }
-  };
-
   return (
     <View style={styles.container}>
       <Stack.Screen options={{ title: isUpdating ? "Update Create" : "Create Product" }} />
+      {isLoading && <ActivityIndicator />}
       <Image source={{ uri: image || defaultPizzaImage }} style={styles.image} />
       <Text onPress={pickImage} style={styles.textButton}>
         Select Image
