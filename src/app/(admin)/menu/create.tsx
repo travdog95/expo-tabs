@@ -17,7 +17,6 @@ const CreateProductScreen = () => {
   const [price, setPrice] = useState("");
   const [errors, setErrors] = useState("");
   const [image, setImage] = useState<string | null>(null);
-  const [isLoading, setIsLoading] = useState(false);
 
   const { id: idString } = useLocalSearchParams();
   const id = parseInt(typeof idString === "string" ? idString : idString?.[0]);
@@ -27,7 +26,7 @@ const CreateProductScreen = () => {
   const { mutate: createProduct } = useCreateProduct();
   const { mutate: updateProduct } = useUpdateProduct();
   const { data: fetchProduct } = useProduct(id);
-  const { mutate: deleteProduct } = useDeleteProduct();
+  const { mutate: deleteProduct, isPending: isDeleting } = useDeleteProduct();
 
   // If we are updating a product, populate the fields with the existing product data
   useEffect(() => {
@@ -105,7 +104,6 @@ const CreateProductScreen = () => {
   };
 
   const onDelete = () => {
-    setIsLoading(true);
     deleteProduct(id, {
       onSuccess: () => {
         resetFields();
@@ -116,7 +114,6 @@ const CreateProductScreen = () => {
       },
       onSettled: () => {
         console.log("Delete product mutation settled");
-        setIsLoading(false);
       },
     });
   };
@@ -145,10 +142,13 @@ const CreateProductScreen = () => {
     }
   };
 
+  if (isDeleting) {
+    return <ActivityIndicator />;
+  }
+
   return (
     <View style={styles.container}>
-      <Stack.Screen options={{ title: isUpdating ? "Update Create" : "Create Product" }} />
-      {isLoading && <ActivityIndicator />}
+      <Stack.Screen options={{ title: isUpdating ? "Update Product" : "Create Product" }} />
       <Image source={{ uri: image || defaultPizzaImage }} style={styles.image} />
       <Text onPress={pickImage} style={styles.textButton}>
         Select Image
