@@ -1,16 +1,24 @@
-import { View, Text, FlatList, Pressable } from "react-native";
+import { View, Text, FlatList, Pressable, ActivityIndicator } from "react-native";
 import { Stack, useLocalSearchParams } from "expo-router";
 import OrdertListItem from "@/src/components/OrderListItem";
-import orders from "@/assets/data/orders";
 import OrderItemListItem from "@/src/components/OrderItemListItem";
 import { OrderStatusList } from "@/src/types";
 import Colors from "@/src/constants/Colors";
+import { useOrderDetails } from "@/src/api/orders";
 
 const OrderDetailsScreen = () => {
-  const { id } = useLocalSearchParams();
-  const order = orders.find((o) => o.id.toString() === id);
+  const { id: idString } = useLocalSearchParams();
+  const id = parseInt(typeof idString === "string" ? idString : idString[0]);
 
-  if (!order) return <Text>Order not found</Text>;
+  const { data: order, error, isLoading } = useOrderDetails(id);
+
+  if (isLoading) {
+    return <ActivityIndicator />;
+  }
+
+  if (error) {
+    return <Text>Failed to load products.</Text>;
+  }
 
   return (
     <View style={{ padding: 10, gap: 20 }}>
@@ -18,9 +26,7 @@ const OrderDetailsScreen = () => {
 
       <FlatList
         data={order.order_items}
-        renderItem={({ item }) => (
-          <OrderItemListItem item={item} key={item.id} />
-        )}
+        renderItem={({ item }) => <OrderItemListItem item={item} key={item.id} />}
         contentContainerStyle={{ gap: 10 }}
         ListHeaderComponent={<OrdertListItem order={order} />}
         ListFooterComponent={
@@ -37,16 +43,12 @@ const OrderDetailsScreen = () => {
                     padding: 10,
                     borderRadius: 5,
                     marginVertical: 10,
-                    backgroundColor:
-                      order.status === status
-                        ? Colors.light.tint
-                        : "transparent",
+                    backgroundColor: order.status === status ? Colors.light.tint : "transparent",
                   }}
                 >
                   <Text
                     style={{
-                      color:
-                        order.status === status ? "white" : Colors.light.tint,
+                      color: order.status === status ? "white" : Colors.light.tint,
                     }}
                   >
                     {status}

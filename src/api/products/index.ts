@@ -1,5 +1,4 @@
 import { supabase } from "@/src/lib/supabase";
-import { Product } from "@/src/types";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
 // This is a custom hook that fetches a list of products from the database.

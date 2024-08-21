@@ -10,8 +10,6 @@ import {
 } from "react-native";
 import { Link, Stack, useLocalSearchParams, useRouter } from "expo-router";
 import { FontAwesome } from "@expo/vector-icons";
-import products from "@/assets/data/products";
-import Button from "@/src/components/Button";
 import { useCart } from "@/src/providers/CartProvider";
 import { PizzaSize } from "@/src/types";
 import Colors from "@/src/constants/Colors";
@@ -51,7 +49,7 @@ const ProductDetailsScreen = () => {
     <View style={styles.container}>
       <Stack.Screen
         options={{
-          title: product.name,
+          title: product!.name,
           headerRight: () => (
             <Link href={`/(admin)/menu/create?id=${id}`} asChild>
               <Pressable>
@@ -68,9 +66,9 @@ const ProductDetailsScreen = () => {
           ),
         }}
       />
-      <Image source={{ uri: product.image || defaultPizzaImage }} style={styles.image} />
-      <Text style={styles.title}>{product.name}</Text>
-      <Text style={styles.price}>${product.price}</Text>
+      <Image source={{ uri: product!.image || defaultPizzaImage }} style={styles.image} />
+      <Text style={styles.title}>{product!.name}</Text>
+      <Text style={styles.price}>${product!.price}</Text>
       {/* <Button text="Add to Cart" onPress={addToCart} /> */}
     </View>
   );
